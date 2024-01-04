@@ -1,11 +1,4 @@
-CREATE  TABLE mathcounts.users (
-  user_id int(8) NOT NULL AUTO_INCREMENT,
-  email VARCHAR(200) NOT NULL ,
-  password VARCHAR(100) NOT NULL ,
-  name VARCHAR(50) NOT NULL ,
-  enabled TINYINT NOT NULL DEFAULT 1 ,
-  PRIMARY KEY (user_id)
-);
+CREATE SCHEMA `new_schema` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE mathcounts.levels (
 	level_id int(1) NOT NULL,
@@ -38,4 +31,13 @@ CREATE TABLE mathcounts.images (
     url VARCHAR(200),
     PRIMARY KEY (image_id),
     CONSTRAINT fk_question_id FOREIGN KEY (question_id) REFERENCES mathcounts.questions (question_id)
+);
+
+CREATE  TABLE mathcounts.contact_message (
+  message_id int NOT NULL AUTO_INCREMENT,
+  name VARCHAR(200) NOT NULL,
+  email VARCHAR(200) NOT NULL,
+  subject VARCHAR(200) NOT NULL,
+  message TEXT,
+  PRIMARY KEY (message_id)
 );
