@@ -38,11 +38,9 @@ body, html {
     </a>
     <!-- Right-sided navbar links -->
     <div class="w3-right w3-hide-small">
-      <a href="/" class="w3-bar-item w3-button">HOME</a>
-      <a href="#team" class="w3-bar-item w3-button"><i class="fa fa-user"></i> MY</a>
-      <a href="#work" class="w3-bar-item w3-button"><i class="fa fa-th"></i> WORK</a>
-      <a href="#pricing" class="w3-bar-item w3-button"><i class="fa fa-graduation-cap"></i> MATHCOUNT</a>
-      <a href="#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home"></i> HOME</a>
+      <a href="/mathcounts" class="w3-bar-item w3-button"><i class="fa fa-graduation-cap"></i> MATHCOUNTS</a>
+      <a href="/#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
     </div>
     <!-- Hide right-floated links on small screens and replace them with a menu icon -->
 
@@ -56,10 +54,8 @@ body, html {
 <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
   <a href="/" onclick="w3_close()" class="w3-bar-item w3-button">HOME</a>
-  <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button">MY</a>
-  <a href="#work" onclick="w3_close()" class="w3-bar-item w3-button">WORK</a>
-  <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button">MATHCOUNT</a>
-  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+  <a href="/mathcounts" onclick="w3_close()" class="w3-bar-item w3-button">MATHCOUNTS</a>
+  <a href="/#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
 </nav>
 
 <!-- MathCount Count Down Section -->
@@ -78,32 +74,43 @@ body, html {
     </div>
     <div id="timer" class="w3-center w3-large w3-black" style="display: none;">45</div>
 
-    <div id="math-problem" style="display: none;">
-      <p class="w3-large">
-        What is the value of <math><msqrt><msup><mi>x</mi><mn>8</mn></msup><mo>+</mo><msup><mi>x</mi><mn>4</mn></msup></msqrt></math> + <math><mfrac><msup><mi>1</mi></msup><msup><mi>3</mi></msup></mfrac></math> + <math><mfrac><msup><mi>1</mi></msup><msup><mi>4</mi></msup></mfrac><mo>+</mo><mfrac><msup><mi>1</mi></msup><msup><mi>5</mi></msup></mfrac></math>? Express your answer as a common fraction.
-      </p>
-    </div>
-
-    <div id="raise-hand" style="display: none">
+    <div id="raise-hand" class="w3-center" style="display: none">
       <p>
-        <button class="w3-button w3-black" onclick="raiseHand()">
-          <i class="fa fa-hand-paper-o"></i> RAISE HAND
+        <button class="w3-button" onclick="raiseHand()">
+          <i class="fa fa-stop-circle fa-5x"  style="color:red"></i>
         </button>
       </p>
     </div>
 
+    <div id="math-problem" style="display: none;">
+      <p class="w3-large">
+        {{ question|safe }}
+      </p>
+    </div>
+
+    <div id="stopTime" class="w3-center w3-large w3-black" style="display: none;">Stopped at: </div>
+
     <div id="answer-section" style="display: none">
       <p class="w3-large">Your Answer:</p>
-      <p><input class="w3-input w3-border" type="text" id="answer" placeholder="Enter your answer"></p>
+      <p>
+        <input class="w3-input w3-border" type="text" id="answer" placeholder="Enter your answer">
+        <input type="hidden" id="answers" value="{{ answers }}">
+        <input type="hidden" id="question" value="{{ question|safe }}">
+      </p>
 
       <p>
-          <button class="w3-button w3-black" onclick="submitAnswer()">
+          <button id="submitAnswer" class="w3-button w3-black" onclick="submitAnswer()">
             <i class="fa fa-paper-plane"></i> SUBMIT ANSWER
           </button>
       </p>
     </div>
 
     <div id="result"></div>
+    <div id="nextButton" class="w3-center" style="display: none">
+      <button class="w3-button w3-black" onclick="nextQuestion()">
+          <i class="fa fa-random"></i> NEXT
+      </button>
+    </div>
   </div>
 </div>
 
@@ -140,33 +147,44 @@ body, html {
       document.getElementById("raise-hand").style.display = "block";
       document.getElementById("result").style.display = "block";
 
+      var question = document.getElementById("question").value;
       var msg = new SpeechSynthesisUtterance();
-      msg.text = "45 seconds starts now.  Here is the questions."
+      msg.text = "Here is the question.";
       window.speechSynthesis.speak(msg);
 
       var display = document.querySelector('#timer');
       timer = startTimer(duration, display);
 
-      msg.text = "Tucker owns a tuk-tuk, a motorized three-wheeled vehicle, which he uses to run a taxi tour. He charges $5 for every mile traveled on a tour, and the tuk-tuk can travel a maximum of 16 miles per hour. What is the minimum number of minutes that it would take Tucker’s tuk-tuk taxi tour to tally $200 in total earnings?";
+      msg.text = question;
       window.speechSynthesis.speak(msg);
     }
 
     function raiseHand() {
       document.getElementById("answer-section").style.display = "block";
       document.getElementById("raise-hand").style.display = "none";
+      document.getElementById("stopTime").style.display = "block";
+
+      var display = document.querySelector('#timer');
+      document.querySelector('#stopTime').textContent = "Stopped at: " + display.textContent;
+
+      if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            var msg = new SpeechSynthesisUtterance();
+            msg.text = "The answer is.";
+            window.speechSynthesis.speak(msg);
+      }
 
       clearInterval(timer);
-      var display = document.querySelector('#timer');
       timer = startTimer(5, display);
     }
 
     function submitAnswer() {
       var userAnswer = document.getElementById("answer").value;
-      var correctAnswer = 5 + 7; // Change this to the correct answer
+      var correctAnswer = "|" + document.getElementById("answers").value + "|";
 
       clearInterval(timer);
 
-      if (userAnswer == correctAnswer) {
+      if (userAnswer && correctAnswer.includes(userAnswer)) {
         showResult(true);
       } else {
         showResult(false);
@@ -175,7 +193,15 @@ body, html {
 
     function showResult(isCorrect) {
       var resultDiv = document.getElementById("result");
-      resultDiv.textContent = isCorrect ? "Correct! Well done." : "Incorrect. Please try again.";
+      var answers = document.getElementById("answers").value.replaceAll("|", " or ");
+      resultDiv.textContent = isCorrect ? "Correct! Well done." : "Incorrect. The correct answer is: " + answers;
+
+      document.getElementById("nextButton").style.display = "block";
+      document.getElementById("submitAnswer").disabled = true;
+    }
+
+    function nextQuestion() {
+      window.location.replace("/countdown");
     }
   </script>
 
