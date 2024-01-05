@@ -2,16 +2,17 @@ from flask import Flask
 from flask import render_template, request, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-import re
+import os
 
 # creates a Flask application
 app = Flask(__name__, template_folder='static/template')
 
 app.secret_key = 'will set secret key'
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password'
+
+app.config['MYSQL_HOST'] = os.environ.get("DB_HOST", "localhost")
+app.config['MYSQL_USER'] = os.environ.get("DB_USER", "root")
+app.config['MYSQL_PASSWORD'] = os.environ.get("DB_PWD", "")
 app.config['MYSQL_DB'] = 'mathcounts'
 mysql = MySQL(app)
 
