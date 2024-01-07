@@ -9,7 +9,6 @@ app = Flask(__name__, template_folder='static/template')
 
 app.secret_key = 'will set secret key'
 
-
 app.config['MYSQL_HOST'] = os.environ.get("DB_HOST", "localhost")
 app.config['MYSQL_USER'] = os.environ.get("DB_USER", "root")
 app.config['MYSQL_PASSWORD'] = os.environ.get("DB_PWD", "")
@@ -73,6 +72,29 @@ def sprint():
     return render_template('sprint_round.html', questions=records, total=len(records))
 
 
+@app.route("/api/target", methods=['POST'])
+def target():
+    level = 2
+    year = 2023
+    if request.method == 'POST':
+        level = request.form['level']
+        year = request.form['year']
+        print("Level/year:  ", level, year)
+        session['level'] = level
+        session['year'] = year
+    else:
+        level = session['level']
+        year = session['year']
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        'SELECT question, answers FROM mathcounts.questions WHERE level_id = % s AND round_id = 2 AND year = % s',
+        (level, year,))
+    records = cursor.fetchall()
+    print("question", len(records))
+    return render_template('target_round.html', questions=records, total=len(records))
+
+
 @app.route("/api/contact", methods=['POST'])
 def contact():
     name = request.form['name']
@@ -88,4 +110,4 @@ def contact():
 
 # run the application
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(port=8000, debug=True)

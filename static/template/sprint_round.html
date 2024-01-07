@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>MathCount countdown round</title>
+<title>MathCounts Sprint Round</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/static/w3.css">
@@ -63,7 +63,7 @@ body, html {
   <h3 class="w3-center">MATHCOUNTS SPRINT ROUND</h3>
   <p class="w3-large">
     This section of the competition consists of 30 problems. You will have 40 minutes to complete all the problems.
-    Click START button to start timer and get the next random question.
+    Click the START button to start the timer and get the set of questions.
   </p>
 
   <div class="w3-container w3-light-grey" style="padding:64px 32px; min-height: 600px; max-width: 800px; margin: 0 auto;">
@@ -75,7 +75,6 @@ body, html {
     <div id="timer" class="w3-center w3-large w3-black" style="display: none;">40:00</div>
 
     <div id="math-problem" style="display: none;">
-      <form name="frmQuestion">
         {% for question in questions %}
           {% set post_loop = loop %}
           <p class="w3-large">
@@ -89,7 +88,6 @@ body, html {
           <p>&nbsp;</p>
         {% endfor %}
         <input type="hidden" id="total" value="{{ total }}">
-      </form>
     </div>
 
     <div id="answer-section" style="display: none">
@@ -146,7 +144,7 @@ body, html {
       var score = 0;
 
       for (let idx = 1; idx <= total; idx++) {
-        var userAnswer = document.getElementById("answer-" + idx).value;
+        var userAnswer = "|" + document.getElementById("answer-" + idx).value + "|";
         var correctAnswer = "|" + document.getElementById("answers-" + idx).value + "|";
 
         if (userAnswer && correctAnswer.includes(userAnswer)) {
