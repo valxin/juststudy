@@ -68,6 +68,7 @@ body, html {
         <li class="w3-padding-16">
           <select class="w3-input w3-border" name="year">
             <option value="2022">2022</option>
+            <option value="2023">2023</option>
           </select>
         </li>
         <li class="w3-light-grey w3-padding-24">
@@ -77,22 +78,25 @@ body, html {
       </form>
     </div>
     <div class="w3-third w3-section">
+      <form method="POST" name ="frmSprint" action="/api/sprint">
       <ul class="w3-ul w3-white w3-hover-shadow">
-        <li class="w3-black w3-xlarge w3-padding-32">SPRINT ROUND - coming soon</li>
+        <li class="w3-black w3-xlarge w3-padding-32">SPRINT ROUND</li>
         <li class="w3-padding-16">
-          <select class="w3-input w3-border" name="level" disabled="disabled">
+          <select class="w3-input w3-border" name="level">
             <option value="2">Chapter</option>
             <option value="3">State</option>
           </select>
         </li>
         <li class="w3-padding-16">
-          <select class="w3-input w3-border" name="year" disabled="disabled">
-            <option value="2022">2022</option>
+          <select class="w3-input w3-border" name="year">
+            <option value="2023">2023</option>
           </select>
-        </li>        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large" disabled="disabled">Submit</button>
+        </li>
+        <li class="w3-light-grey w3-padding-24">
+          <button class="w3-button w3-black w3-padding-large" onclick="startSprint()">Submit</button>
         </li>
       </ul>
+      </form>
     </div>
     <div class="w3-third w3-section">
       <ul class="w3-ul w3-white w3-hover-shadow">
@@ -156,6 +160,10 @@ body, html {
 
   function startCountdown() {
     document.frmCountdown.submit();
+  }
+
+  function startSprint() {
+    document.frmSprint.submit();
   }
 </script>
 
