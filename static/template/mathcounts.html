@@ -72,7 +72,7 @@ body, html {
           </select>
         </li>
         <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large"  onclick="startCountdown()">Submit</button>
+          <button class="w3-button w3-black w3-padding-large"  onclick="startCountdown()">Start</button>
         </li>
       </ul>
       </form>
@@ -93,30 +93,32 @@ body, html {
           </select>
         </li>
         <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large" onclick="startSprint()">Submit</button>
+          <button class="w3-button w3-black w3-padding-large" onclick="startSprint()">Start</button>
         </li>
       </ul>
       </form>
     </div>
     <div class="w3-third w3-section">
+      <form method="POST" name ="frmTarget" action="/api/target">
       <ul class="w3-ul w3-white w3-hover-shadow">
-        <li class="w3-black w3-xlarge w3-padding-32">TARGET ROUND - coming soon</li>
+        <li class="w3-black w3-xlarge w3-padding-32">TARGET ROUND</li>
         <li class="w3-padding-16">
-          <select class="w3-input w3-border" name="level" disabled="disabled">
+          <select class="w3-input w3-border" name="level">
             <option value="2">Chapter</option>
             <option value="3">State</option>
           </select>
         </li>
         <li class="w3-padding-16">
-          <select class="w3-input w3-border" name="year" disabled="disabled">
-            <option value="2022">2022</option>
+          <select class="w3-input w3-border" name="year">
+            <option value="2023">2023</option>
           </select>
         </li>        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large" disabled="disabled">
-            Submit
+          <button class="w3-button w3-black w3-padding-large" onclick="startTarget()">
+            Start
           </button>
         </li>
       </ul>
+      </form>
     </div>
   </div>
 </div>
@@ -164,6 +166,10 @@ body, html {
 
   function startSprint() {
     document.frmSprint.submit();
+  }
+
+  function startTarget() {
+    document.frmTarget.submit();
   }
 </script>
 
