@@ -50,7 +50,30 @@ def countdown():
     return render_template('countdown.html', question=records["question"], answers=records["answers"])
 
 
-@app.route("/contact", methods=['POST'])
+@app.route("/api/sprint", methods=['POST'])
+def sprint():
+    level = 2
+    year = 2022
+    if request.method == 'POST':
+        level = request.form['level']
+        year = request.form['year']
+        print("Level/year:  ", level, year)
+        session['level'] = level
+        session['year'] = year
+    else:
+        level = session['level']
+        year = session['year']
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        'SELECT question, answers FROM mathcounts.questions WHERE level_id = % s AND round_id = 1 AND year = % s',
+        (level, year,))
+    records = cursor.fetchall()
+    print("question", len(records))
+    return render_template('sprint_round.html', questions=records, total=len(records))
+
+
+@app.route("/api/contact", methods=['POST'])
 def contact():
     name = request.form['name']
     email = request.form['email']
