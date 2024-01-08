@@ -86,6 +86,9 @@ body, html {
       <p class="w3-large">
         {{ question|safe }}
       </p>
+      {% if imageUrl != "" %}
+        <p><img src="{{imageUrl}}" style='max-width: 90%; height: auto;' /></p>
+      {% endif %}
     </div>
 
     <div id="stopTime" class="w3-center w3-large w3-black" style="display: none;">Stopped at: </div>
