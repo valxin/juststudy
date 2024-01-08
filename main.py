@@ -71,7 +71,7 @@ def sprint():
         "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
         "FROM mathcounts.questions q " +
         "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
-        "WHERE i.level_id = % s AND i.round_id = 1 AND i.year = % s",
+        "WHERE q.level_id = % s AND q.round_id = 1 AND q.year = % s",
         (level, year,))
     records = cursor.fetchall()
     print("question", len(records))
