@@ -80,6 +80,9 @@ body, html {
           <p class="w3-large">
             {{ post_loop.index }}. {{ question['question']|safe }}
           </p>
+          {% if questions[7]['imageUrl'] != "" %}
+            <p><img src="{{questions['imageUrl']}}" /></p>
+          {% endif %}
           <p>
             <input class="w3-input w3-border" type="text" id="answer-{{ post_loop.index }}" placeholder="Enter your answer">
           </p>

@@ -42,11 +42,14 @@ def countdown():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        'SELECT question, answers FROM mathcounts.questions WHERE level_id = % s AND round_id = 4 AND year = % s ORDER BY RAND() LIMIT 1',
+        "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
+        "FROM mathcounts.questions q " +
+        "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
+        "WHERE q.level_id = % s AND q.round_id = 4 AND q.year = % s ORDER BY RAND() LIMIT 1",
         (level, year,))
     records = cursor.fetchone()
 
-    return render_template('countdown.html', question=records["question"], answers=records["answers"])
+    return render_template('countdown.html', question=records["question"], answers=records["answers"], imageUrl=records["imageUrl"])
 
 
 @app.route("/api/sprint", methods=['POST'])
@@ -65,7 +68,10 @@ def sprint():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        'SELECT question, answers FROM mathcounts.questions WHERE level_id = % s AND round_id = 1 AND year = % s',
+        "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
+        "FROM mathcounts.questions q " +
+        "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
+        "WHERE i.level_id = % s AND i.round_id = 1 AND i.year = % s",
         (level, year,))
     records = cursor.fetchall()
     print("question", len(records))
@@ -88,7 +94,10 @@ def target():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        'SELECT question, answers FROM mathcounts.questions WHERE level_id = % s AND round_id = 2 AND year = % s',
+        "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
+        "FROM mathcounts.questions q " +
+        "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
+        "WHERE q.level_id = % s AND q.round_id = 2 AND q.year = % s",
         (level, year,))
     records = cursor.fetchall()
     print("question", len(records))
@@ -110,4 +119,4 @@ def contact():
 
 # run the application
 if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+    app.run(debug=False)
