@@ -177,7 +177,7 @@ def signUp():
             (email,))
         record = cursor.fetchone()
 
-        session['user_id'] = records['user_id']
+        session['user_id'] = record['user_id']
         session['nickname'] = name
         session['email'] = email
 
