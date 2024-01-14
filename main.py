@@ -1,8 +1,8 @@
 from flask import Flask
-from flask import render_template, request, session
+from flask import render_template, redirect, request, session, jsonify
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-import os
+import os, json
 
 # creates a Flask application
 app = Flask(__name__, template_folder='static/template')
@@ -15,6 +15,8 @@ app.config['MYSQL_PASSWORD'] = os.environ.get("DB_PWD", "")
 app.config['MYSQL_DB'] = 'mathcounts'
 mysql = MySQL(app)
 
+emailUser = "juststudy.net@gmail.com"
+emailPwd = os.environ.get("EMAIL_PWD", "")
 
 @app.route("/")
 def home():
@@ -42,14 +44,32 @@ def countdown():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
+        "SELECT q.question_id, q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
         "FROM mathcounts.questions q " +
         "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
         "WHERE q.level_id = % s AND q.round_id = 4 AND q.year = % s ORDER BY RAND() LIMIT 1",
         (level, year,))
     records = cursor.fetchone()
 
-    return render_template('countdown.html', question=records["question"], answers=records["answers"], imageUrl=records["imageUrl"])
+    return render_template('countdown.html',
+                           question_id=records['question_id'],
+                           question=records["question"],
+                           answers=records["answers"],
+                           imageUrl=records["imageUrl"])
+
+
+@app.route('/api/timescore', methods=['POST'])
+def timescore():
+    user_id = session['user_id']
+    if user_id is not None:
+        score_data = json.loads(request.data)
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('INSERT INTO mathcounts.user_countdown (question_id,user_id,time_used,score_time,leaderboard) '
+                       'VALUES (% s, % s, % s, sysdate(), 0)',
+                       (score_data['question_id'], user_id, score_data['time_used'],))
+        mysql.connection.commit()
+
+    return '', 201, {"msg": "saved"}
 
 
 @app.route("/api/sprint", methods=['POST'])
@@ -100,8 +120,23 @@ def target():
         "WHERE q.level_id = % s AND q.round_id = 2 AND q.year = % s",
         (level, year,))
     records = cursor.fetchall()
-    print("question", len(records))
+    print("level: ", level, "question", len(records))
     return render_template('target_round.html', questions=records, total=len(records))
+
+
+@app.route('/api/recordscore', methods=['POST'])
+def recordscore():
+    user_id = session['user_id']
+    if user_id is not None:
+        score_data = json.loads(request.data)
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("INSERT INTO mathcounts.user_score "
+                       "(level_id,round_id,year,user_id,score,score_time,leaderboard) "
+                       "VALUES (% s, % s, % s, % s, % s, sysdate(), 0)",
+                       (session['level'], score_data['round_id'], session['year'], user_id, score_data['score'],))
+        mysql.connection.commit()
+
+    return '', 201, {"msg": "saved"}
 
 
 @app.route("/api/contact", methods=['POST'])
@@ -116,6 +151,144 @@ def contact():
                    (name, email, subject, message,))
     mysql.connection.commit()
     return render_template('contact.html')
+
+
+@app.route("/api/signUp", methods=['POST'])
+def signUp():
+    name = request.form['name']
+    email = request.form['email']
+    pwd = request.form['pwd']
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        "SELECT nickname FROM mathcounts.users WHERE nickname = % s OR email = % s ", (name, email,))
+    records = cursor.fetchall()
+
+    if len(records) > 0:
+        return render_template('dashboard.html', name="", email="", error="Nick name or email already exist.  Please log in or try a different nick name or email.")
+    else:
+        hash_password = hash_pwd(pwd)
+        cursor.execute('INSERT INTO mathcounts.users (nickname,email,password,active) VALUES (% s, % s, % s, 1)',
+                       (name, email, hash_password,))
+        mysql.connection.commit()
+
+        cursor.execute(
+            "SELECT user_id FROM mathcounts.users WHERE email = % s",
+            (email, hash_password,))
+        record = cursor.fetchone()
+
+        session['user_id'] = records['user_id']
+        session['nickname'] = name
+        session['email'] = email
+
+        return render_template('dashboard.html', name=name, email=email, error="")
+
+
+def hash_pwd(password):
+    import hashlib
+
+    hash_object = hashlib.sha256()
+    hash_object.update(password.encode())
+    return hash_object.hexdigest()
+
+
+def send_email(recipient, subject, body):
+    import smtplib
+
+    FROM = emailUser
+    TO = recipient
+    SUBJECT = subject
+    TEXT = body
+
+    # Prepare actual message
+    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, TO, SUBJECT, TEXT)
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(emailUser, emailPwd)
+        server.sendmail(FROM, TO, message)
+        server.close()
+        print('successfully sent the mail')
+    except Exception as e: print(e)
+
+
+@app.route("/api/signin", methods=['POST'])
+def signin():
+    email = request.form['email']
+    pwd = request.form['pwd']
+    hash_password = hash_pwd(pwd)
+
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(
+        "SELECT user_id, nickname FROM mathcounts.users WHERE email = % s AND password = % s ", (email, hash_password,))
+    records = cursor.fetchall()
+
+    if len(records) == 1:
+        session['user_id'] = records[0]['user_id']
+        session['nickname'] = records[0]['nickname']
+        session['email'] = email
+        session.permanent = True
+        return render_template('dashboard.html', name=records[0]['nickname'], email=email, error="")
+    else:
+        return render_template('dashboard.html', name="", email="",
+                               error="Invalid email or password, please try again.")
+
+
+@app.route("/api/dashboard", methods=['GET', 'POST'])
+def dashboard():
+    user_id = session.get('user_id')
+    nickname = session.get('nickname')
+    if user_id is None:
+        return redirect("/#signin")
+    else:
+        # count down round section
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "SELECT c.time_used, DATE_FORMAT(c.score_time,'%%m/%%d/%%Y') AS score_time, "
+            "CASE WHEN c.leaderboard = 1 THEN 'Yes' ELSE 'No' END as leaderboard, "
+            "q.question_no, q.year, l.level "
+            "FROM mathcounts.user_countdown c "
+            "JOIN mathcounts.questions q ON c.question_id = q.question_id "
+            "JOIN mathcounts.levels l ON l.level_id = q.level_id "
+            "WHERE c.user_id = % s "
+            "ORDER BY l.level_id, q.year, q.question_no",
+            (user_id,))
+        countdowns = cursor.fetchall()
+
+        cursor.execute(
+            "SELECT s.score, DATE_FORMAT(s.score_time,'%%m/%%d/%%Y') AS score_time,  "
+            "CASE WHEN s.leaderboard = 1 THEN 'Yes' ELSE 'No' END as leaderboard, s.year, l.level "
+            "FROM mathcounts.user_score s "
+            "JOIN mathcounts.levels l ON l.level_id = s.level_id "
+            "WHERE s.user_id = % s AND s.round_id = 1 "
+            "ORDER BY l.level_id, s.year, s.score_time",
+            (user_id,))
+        sprints = cursor.fetchall()
+
+        cursor.execute(
+            "SELECT s.score, DATE_FORMAT(s.score_time,'%%m/%%d/%%Y') AS score_time,  "
+            "CASE WHEN s.leaderboard = 1 THEN 'Yes' ELSE 'No' END as leaderboard, s.year, l.level "
+            "FROM mathcounts.user_score s "
+            "JOIN mathcounts.levels l ON l.level_id = s.level_id "
+            "WHERE s.user_id = % s AND s.round_id = 2 "
+            "ORDER BY l.level_id, s.year, s.score_time",
+            (user_id,))
+        targets = cursor.fetchall()
+
+        return render_template('dashboard.html',
+                               name=nickname,
+                               countdowns=countdowns,
+                               sprints=sprints,
+                               targets=targets,
+                               error="")
+
+
+@app.route("/api/leaderboard", methods=['GET', 'POST'])
+def leaderboard():
+    return render_template('leaderboard.html', error="")
+
 
 # run the application
 if __name__ == "__main__":

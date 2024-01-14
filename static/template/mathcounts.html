@@ -32,7 +32,8 @@ body, html {
     <div class="w3-right w3-hide-small">
       <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home"></i> HOME</a>
       <a href="/mathcounts" class="w3-bar-item w3-button"><i class="fa fa-graduation-cap"></i> MATHCOUNTS</a>
-      <a href="/#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      <a href="/api/leaderboard" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> LEADERBOARD</a>
+      <a href="/api/dashboard" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> DASHBOARD</a>
     </div>
     <!-- Hide right-floated links on small screens and replace them with a menu icon -->
 
@@ -46,12 +47,13 @@ body, html {
 <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
   <a href="/" onclick="w3_close()" class="w3-bar-item w3-button">HOME</a>
-  <a href="/mathcounts" onclick="w3_close()" class="w3-bar-item w3-button">MATHCOUNTS</a>
-  <a href="/#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+  <a href="/mathcounts.html" onclick="w3_close()" class="w3-bar-item w3-button">MATHCOUNTS</a>
+  <a href="/api/leaderboard" onclick="w3_close()" class="w3-bar-item w3-button">LEADERBOARD</a>
+  <a href="/api/dashboard" onclick="w3_close()" class="w3-bar-item w3-button">DASHBOARD</a>
 </nav>
 
 <!-- MathCounts Section -->
-<div class="w3-container w3-center w3-dark-grey" style="padding:128px 16px" id="signin">
+<div class="w3-container w3-center w3-dark-grey" style="padding:128px 16px" id="mathcounts">
   <h3>MATHCOUNTS</h3>
   <p class="w3-large">Fun programs for grades 6-8!  Help students to prepare and practice tests.</p>
   <div class="w3-row-padding" style="margin-top:64px">

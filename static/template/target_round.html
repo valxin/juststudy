@@ -39,8 +39,9 @@ body, html {
     <!-- Right-sided navbar links -->
     <div class="w3-right w3-hide-small">
       <a href="/" class="w3-bar-item w3-button"><i class="fa fa-home"></i> HOME</a>
-      <a href="/mathcounts" class="w3-bar-item w3-button"><i class="fa fa-graduation-cap"></i> MATHCOUNTS</a>
-      <a href="/#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a>
+      <a href="/mathcounts.html" class="w3-bar-item w3-button"><i class="fa fa-graduation-cap"></i> MATHCOUNTS</a>
+      <a href="/api/leaderboard" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> LEADERBOARD</a>
+      <a href="/api/dashboard" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> DASHBOARD</a>
     </div>
     <!-- Hide right-floated links on small screens and replace them with a menu icon -->
 
@@ -55,7 +56,8 @@ body, html {
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
   <a href="/" onclick="w3_close()" class="w3-bar-item w3-button">HOME</a>
   <a href="/mathcounts.html" onclick="w3_close()" class="w3-bar-item w3-button">MATHCOUNTS</a>
-  <a href="/#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+  <a href="/api/leaderboard" onclick="w3_close()" class="w3-bar-item w3-button">LEADERBOARD</a>
+  <a href="/api/dashboard" onclick="w3_close()" class="w3-bar-item w3-button">DASHBOARD</a>
 </nav>
 
 <!-- MathCount Count Down Section -->
@@ -234,17 +236,17 @@ body, html {
     var duration = 360;
 
     function startTimer(duration, display) {
-      var timer = duration, minutes, seconds;
+      var currTime = duration, minutes, seconds;
       return setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
+        minutes = parseInt(currTime / 60, 10);
+        seconds = parseInt(currTime % 60, 10);
 
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
         display.textContent = minutes + ":" + seconds;
 
-        if (--timer < 0) {
+        if (--currTime < 0) {
           // Time is up, you can handle this event accordingly
           clearInterval(timer);
           display.textContent = "Time's up!";
@@ -288,6 +290,7 @@ body, html {
        }
 
        document.querySelector('#timer').textContent = "Target Round Score: " + score;
+       submitScore(score);
     }
 
     function showResult(idx, isCorrect) {
@@ -307,6 +310,23 @@ body, html {
       document.getElementById("question_set_" + (index + 1)).style.display = "block";
     }
 
+    function submitScore(score) {
+      var url = '/api/recordscore';
+      var data = new Object();
+      data.round_id = 2;
+      data.score = score;
+
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data), // data can be `string` or {object}!
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json())
+      .then(response => console.log('Success:', JSON.stringify(response)))
+      .catch(error => console.error('Error:', error));
+    }
+
       // Modal Image Gallery
       function onClick(element) {
         document.getElementById("img01").src = element.src;
@@ -314,7 +334,6 @@ body, html {
         var captionText = document.getElementById("caption");
         captionText.innerHTML = element.alt;
       }
-
 
       // Toggle between showing and hiding the sidebar when clicking the menu icon
       var mySidebar = document.getElementById("mySidebar");
