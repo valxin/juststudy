@@ -91,7 +91,8 @@ def sprint():
         "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
         "FROM mathcounts.questions q " +
         "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
-        "WHERE q.level_id = % s AND q.round_id = 1 AND q.year = % s",
+        "WHERE q.level_id = % s AND q.round_id = 1 AND q.year = % s "
+        "ORDER BY q.question_no",
         (level, year,))
     records = cursor.fetchall()
     print("question", len(records))
@@ -117,7 +118,8 @@ def target():
         "SELECT q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
         "FROM mathcounts.questions q " +
         "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
-        "WHERE q.level_id = % s AND q.round_id = 2 AND q.year = % s",
+        "WHERE q.level_id = % s AND q.round_id = 2 AND q.year = % s "
+        "ORDER BY q.question_no",
         (level, year,))
     records = cursor.fetchall()
     print("level: ", level, "question", len(records))
@@ -250,7 +252,7 @@ def dashboard():
             "CASE WHEN c.leaderboard = 1 THEN 'Yes' ELSE 'No' END as leaderboard, "
             "q.question_no, q.year, l.level "
             "FROM mathcounts.user_countdown c "
-            "JOIN mathcounts.questions q ON c.question_id = q.question_id "
+            "JOIN mathcounts.questions q ON c.question_id = q.question_id AND q.round_id = 4 "
             "JOIN mathcounts.levels l ON l.level_id = q.level_id "
             "WHERE c.user_id = % s "
             "ORDER BY l.level_id, q.year, q.question_no",
