@@ -119,7 +119,7 @@ body, html {
                   <td>{{ item['score_time'] }}</td>
                   <td>{{ item['leaderboard'] }}</td>
                 </tr>
-          {% if post_loop.last or item['level'] != sprints[post_loop.index]['level'] or item['year'] != sprints[post_loop.index-2]['year'] %}
+          {% if post_loop.last or item['level'] != sprints[post_loop.index]['level'] or item['year'] != sprints[post_loop.index]['year'] %}
               </table>
             </li>
           {% endif %}
@@ -151,7 +151,7 @@ body, html {
                   <td>{{ item['score_time'] }}</td>
                   <td>{{ item['leaderboard'] }}</td>
                 </tr>
-          {% if post_loop.last or item['level'] != targets[post_loop.index]['level'] or item['year'] != targets[post_loop.index-2]['year'] %}
+          {% if post_loop.last or item['level'] != targets[post_loop.index]['level'] or item['year'] != targets[post_loop.index]['year'] %}
               </table>
             </li>
           {% endif %}
