@@ -174,7 +174,7 @@ def signUp():
 
         cursor.execute(
             "SELECT user_id FROM mathcounts.users WHERE email = % s",
-            (email, hash_password,))
+            (email,))
         record = cursor.fetchone()
 
         session['user_id'] = records['user_id']
