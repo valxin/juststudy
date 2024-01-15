@@ -77,14 +77,12 @@ body, html {
                   <th>Question</th>
                   <th>Time</th>
                   <th>Date</th>
-                  <th>Submitted</th>
                 </tr>
           {% endif %}
                 <tr class="w3-gray">
                   <td>{{ item['question_no'] }}</td>
                   <td>{{ item['time_used'] }}</td>
                   <td>{{ item['score_time'] }}</td>
-                  <td>{{ item['leaderboard'] }}</td>
                 </tr>
           {% if post_loop.last or item['level'] != countdowns[post_loop.index]['level'] or item['year'] != countdowns[post_loop.index-2]['year'] %}
               </table>
@@ -92,9 +90,6 @@ body, html {
           {% endif %}
         {% endfor %}
 
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large"  onclick="Submit()">Submit</button>
-        </li>
       </ul>
       </form>
     </div>
@@ -111,13 +106,11 @@ body, html {
                 <tr class="w3-black" >
                   <th>Score</th>
                   <th>Date</th>
-                  <th>Submitted</th>
                 </tr>
           {% endif %}
                 <tr class="w3-gray">
                   <td>{{ item['score'] }}</td>
                   <td>{{ item['score_time'] }}</td>
-                  <td>{{ item['leaderboard'] }}</td>
                 </tr>
           {% if post_loop.last or item['level'] != sprints[post_loop.index]['level'] or item['year'] != sprints[post_loop.index]['year'] %}
               </table>
@@ -125,9 +118,6 @@ body, html {
           {% endif %}
         {% endfor %}
 
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large" onclick="startSprint()">Submit</button>
-        </li>
       </ul>
     </div>
     <div class="w3-third w3-section">
@@ -143,13 +133,11 @@ body, html {
                 <tr class="w3-black" >
                   <th>Score</th>
                   <th>Date</th>
-                  <th>Submitted</th>
                 </tr>
           {% endif %}
                 <tr class="w3-gray">
                   <td>{{ item['score'] }}</td>
                   <td>{{ item['score_time'] }}</td>
-                  <td>{{ item['leaderboard'] }}</td>
                 </tr>
           {% if post_loop.last or item['level'] != targets[post_loop.index]['level'] or item['year'] != targets[post_loop.index]['year'] %}
               </table>
@@ -157,9 +145,6 @@ body, html {
           {% endif %}
         {% endfor %}
 
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-black w3-padding-large" onclick="Submit()">Submit</button>
-        </li>
       </ul>
     </div>
       </form>
