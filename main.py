@@ -374,4 +374,8 @@ def leaderboard():
 
 # run the application
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     app.run(debug=False, port=8000)
+=======
+    app.run(port=5000, debug=True)
+>>>>>>> Stashed changes
