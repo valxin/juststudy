@@ -86,7 +86,7 @@ body, html {
 
     <div id="math-problem" style="display: none;">
       <p class="w3-large">
-        {{ question|safe }}
+        {{ question_no }}. {{ question|safe }}
       </p>
       {% if imageUrl != "" %}
         <p><img src="{{imageUrl}}" style='max-width: 90%; height: auto;' /></p>

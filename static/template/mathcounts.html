@@ -67,8 +67,14 @@ body, html {
         </li>
         <li class="w3-padding-16">
           <select class="w3-input w3-border" name="year">
-            <option value="2022">2022</option>
             <option value="2023">2023</option>
+            <option value="2020">2020</option>
+            <option value="2019">2019</option>
+          </select>
+        </li>
+        <li class="w3-padding-16">
+          <select class="w3-input w3-border" name="start_no" id="start_no">
+            <option value="0">Random</option>
           </select>
         </li>
         <li class="w3-light-grey w3-padding-24">
@@ -139,6 +145,8 @@ body, html {
 </footer>
 
 <script>
+  initOption()
+
   // Modal Image Gallery
   function onClick(element) {
     document.getElementById("img01").src = element.src;
@@ -174,6 +182,17 @@ body, html {
 
   function startTarget() {
     document.frmTarget.submit();
+  }
+
+  function initOption() {
+    var select = document.getElementById("start_no");
+
+    for(var i = 1; i <= 80; i++) {
+        var el = document.createElement("option");
+        el.textContent = i;
+        el.value = i;
+        select.appendChild(el);
+    }
   }
 </script>
 

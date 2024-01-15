@@ -32,27 +32,40 @@ def mathcounts():
 def countdown():
     level = 2
     year = 2022
+    start_no = 0
     if request.method == 'POST':
         level = request.form['level']
         year = request.form['year']
+        start_no = int(request.form['start_no'])
         print("Level/year:  ", level, year)
         session['level'] = level
         session['year'] = year
+        session['start_no'] = start_no
     else:
         level = session['level']
         year = session['year']
+        start_no = int(session['start_no'])
+
+    question_num_condition = ""
+    if start_no > 0:
+        question_num_condition = "AND q.question_no = " + str(start_no) + " "
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(
-        "SELECT q.question_id, q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
+        "SELECT q.question_id, q.question_no, q.question, q.answers, IFNULL(i.url, '') AS imageUrl " +
         "FROM mathcounts.questions q " +
         "LEFT JOIN mathcounts.images i ON q.question_id = i.question_id " +
-        "WHERE q.level_id = % s AND q.round_id = 4 AND q.year = % s ORDER BY RAND() LIMIT 1",
+        "WHERE q.level_id = % s AND q.round_id = 4 AND q.year = % s " + question_num_condition +
+        "ORDER BY RAND() LIMIT 1",
         (level, year,))
     records = cursor.fetchone()
 
+    if start_no > 0:
+        session['start_no'] = start_no + 1
+
     return render_template('countdown.html',
                            question_id=records['question_id'],
+                           question_no=records['question_no'],
                            question=records["question"],
                            answers=records["answers"],
                            imageUrl=records["imageUrl"])
