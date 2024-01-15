@@ -302,9 +302,76 @@ def dashboard():
 
 @app.route("/api/leaderboard", methods=['GET', 'POST'])
 def leaderboard():
-    return render_template('leaderboard.html', error="")
+        # count down round section
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            "WITH score_analysis "
+                "AS ( "
+	            "SELECT q.year, l.level, q.question_no, c.time_used, u.nickname, "
+		        "row_number() OVER ( "
+		        "PARTITION BY q.year, l.level "
+		        "ORDER BY c.time_used, q.question_no desc, c.user_id "
+		        ") AS row_num "
+	        "FROM mathcounts.user_countdown c "
+	        "JOIN mathcounts.questions q ON c.question_id = q.question_id "
+	        "JOIN mathcounts.levels l ON l.level_id = q.level_id "
+	        "JOIN mathcounts.users u ON u.user_id = c.user_id "
+	        "WHERE q.round_id = 4 "
+            ") "
+        "SELECT year, level, question_no, time_used, nickname, row_num "
+        "FROM score_analysis "
+        "WHERE row_num <=10 "
+        "ORDER BY year DESC, level; ",
+            ())
+        countdowns = cursor.fetchall()
+
+        cursor.execute(
+            "WITH score_analysis "
+                "AS ( "
+                "SELECT c.year, l.level, c.score, u.nickname, "
+                "row_number() OVER ( "
+                "PARTITION BY c.year, l.level "
+                "ORDER BY c.score desc, c.user_id "
+                ") AS row_num "
+            "FROM mathcounts.user_score c "
+            "JOIN mathcounts.levels l ON l.level_id = c.level_id "
+            "JOIN mathcounts.users u ON u.user_id = c.user_id "
+            "WHERE c.round_id = 1 "
+            ") "
+        "SELECT year, level, score, nickname, row_num "
+        "FROM score_analysis "
+        "WHERE row_num <=5 "
+        "ORDER BY year DESC, level; ",
+            ())
+        sprints = cursor.fetchall()
+
+        cursor.execute(
+            "WITH score_analysis "
+                "AS ( "
+                "SELECT c.year, l.level, c.score, u.nickname, "
+                "row_number() OVER ( "
+                "PARTITION BY c.year, l.level "
+                "ORDER BY c.score desc, c.user_id "
+                ") AS row_num "
+            "FROM mathcounts.user_score c "
+            "JOIN mathcounts.levels l ON l.level_id = c.level_id "
+            "JOIN mathcounts.users u ON u.user_id = c.user_id "
+            "WHERE c.round_id = 2 "
+            ") "
+        "SELECT year, level, score, nickname, row_num "
+        "FROM score_analysis "
+        "WHERE row_num <=5 "
+        "ORDER BY year DESC, level; ",
+            ())
+        targets = cursor.fetchall()
+
+        return render_template('leaderboard.html',
+                               countdowns=countdowns,
+                               sprints=sprints,
+                               targets=targets,
+                               error="")
 
 
 # run the application
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=False, port=8000)
