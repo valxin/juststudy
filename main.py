@@ -60,7 +60,7 @@ def countdown():
         (level, year,))
     records = cursor.fetchone()
 
-    if start_no > 0:
+    if start_no > 0 and start_no != 80:
         session['start_no'] = start_no + 1
 
     return render_template('countdown.html',
